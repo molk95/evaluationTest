@@ -1,8 +1,8 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import Card from "@material-ui/core/Card";
-import Container from '@material-ui/core/Container';
+import Container from "@material-ui/core/Container";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import Collapse from "@material-ui/core/Collapse";
@@ -33,36 +33,42 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function ProfileCard({ user }) {
+export default function ProfileCard({ user, getPost = () => {} }) {
   const classes = useStyles();
   const [expanded] = React.useState(false);
 
   return (
-      <Container>
-    <Card className={classes.card}>
-      <CardHeader avatar={<Avatar className={classes.avatar}>{user.name[0]}</Avatar>} />
+    <Container>
+      <Card className={classes.card}>
+        <CardHeader
+          avatar={
+            <Avatar  className={classes.avatar} >
+              {user.name[0]}
+            </Avatar>
+          }
+        />
 
-      <CardContent>
+        <CardContent>
+          <Typography variant="body2" color="textSecondary" component="p">
+            <div>
+              <h4>Name:</h4> <span>{user.name}</span>
+            </div>
+
+            <div>
+              <h4>Email:</h4> <span>{user.email}</span>
+            </div>
+
+            <div>
+              <h4>Phone:</h4> <span>{user.phone}</span>{" "}
+            </div>
+          </Typography>
+        </CardContent>
         <Typography variant="body2" color="textSecondary" component="p">
-         
-             <div><h4>Name:</h4> <span>{user.name}</span></div>
-            
-            <div><h4>Email:</h4> <span>{user.email}</span></div>
-            
-            <div><h4>Phone:</h4> <span>{user.phone}</span> </div>
-          
+          <Link to={`/posts/${user.id}`}><p onClick={() => getPost(user.id)}>Posts</p></Link>
         </Typography>
-      </CardContent>
-      <Typography variant="body2" color="textSecondary" component="p">
-        <Link
-        to="/users-list"
-        >
-        Posts
-        </Link>
-        
-      </Typography>
 
-      <Collapse in={expanded} timeout="auto" unmountOnExit></Collapse>
-    </Card></Container>
+        <Collapse in={expanded} timeout="auto" unmountOnExit></Collapse>
+      </Card>
+    </Container>
   );
 }

@@ -2,10 +2,9 @@ import React from "react";
 import axios from "axios";
 import { Switch, Route } from "react-router-dom";
 import "./App.css";
-
-import Container from "@material-ui/core/Container";
-import ProfileCard from "./components/profileCard";
-import PostPage from "./components/postPage";
+import Profiles from "./components/Profiles";
+import Posts from "./components/Posts";
+import Comments from "./components/comments"
 
 class App extends React.Component {
   state = {
@@ -16,8 +15,8 @@ class App extends React.Component {
     postsList: [],
     title: "",
     body: "",
-    userId: ""
-
+    userId: "",
+    comments: []
   };
 
   componentDidMount = () => {
@@ -38,60 +37,55 @@ class App extends React.Component {
       .then(res => this.setState({ postsList: res.data }))
       .catch(err => console.log(err));
   };
-  getPerson = user => {
-    this.setState({
-      name: user.name,
-      phone: user.phone,
-      email: user.email
-    });
-  };
-  getPost = post => {
-    this.setState({
-      title: post.title,
-      body: post.body,
-      userId: post.userId
-    });
-  };
-  getPostsbyUserId = () => {
+
+  getPostsbyUserId = id => {
     axios
-      .get(
-        `https://jsonplaceholder.typicode.com/posts?userId=1${this.state.userId}`,
-        {
-          title: this.state.title,
-          body: this.state.body
-        }
-      )
-      .then(this.getAllContacts);
-    this.reset();
+      .get(`https://jsonplaceholder.typicode.com/posts/?userId=${id}`)
+      .then(res => {
+        this.setState({ postsList: res.data });
+      });
+  };
+  getCommentsbyPostId = id => {
+    axios
+      .get(`https://jsonplaceholder.typicode.com/comments/?postId=${id}`)
+      .then(res => {
+        this.setState({ comments: res.data });
+      });
   };
   render() {
-    // const classes = useStyles();
     return (
       <div>
-        <Container maxWidth="sm">
-          <Switch>
-            <Route
-              path="/users-list"
-              render={() => (
-                <div className="users-list">
-                  {this.state.usersList.map(el => (
-                    <ProfileCard user={el} getPerson={this.getPerson} />
-                  ))}
-                </div>
-              )}
-            />
-            <Route
-              path="/"
-              render={() => (
-                <div className="posts-list">
-                  {this.state.postsList.map(el => (
-                    <PostPage post={el} getPost={this.getPost} />
-                  ))}
-                </div>
-              )}
-            />
-          </Switch>
-        </Container>
+        <Switch>
+          <Route
+            path="/"
+            render={() => (
+              <Profiles
+                getUsers={this.state.usersList}
+                getPosts={this.getPostsbyUserId}
+              />
+            )}
+          />
+          <Route
+            path="/posts/:id"
+            render={() => (
+              <Posts
+                getPostsbyUserId={this.state.postsList}
+                getCommentsPost={this.getCommentsbyPostId}
+                getUsers={this.state.usersList}
+              />
+            )}
+          />
+          <Route
+            exact
+            path="/postComments/:id"
+            render={() => (
+              <Comments
+              getCommentsPost={this.state.comments}
+                getPostUser={this.state.postsList}
+              />
+            )}
+          />
+        </Switch>
       </div>
     );
   }
